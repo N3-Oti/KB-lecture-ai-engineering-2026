@@ -39,6 +39,39 @@ def test_lecture_summary():
     assert "まだありません" in tools.get_lecture_summary(99)
 
 
+def test_make_quiz_asks_for_term_from_definition(monkeypatch):
+    terms = tools.load_glossary()
+    peft = next(entry for entry in terms if entry["id"] == "peft")
+    selected_from = []
+
+    def choose(candidates):
+        selected_from.extend(candidates)
+        return peft
+
+    monkeypatch.setattr(tools.random, "choice", choose)
+
+    quiz = json.loads(tools.make_quiz(2))
+
+    assert selected_from
+    assert all(entry["lecture"] == 2 for entry in selected_from)
+    assert quiz["question"] == f"次の説明に当てはまる用語は何ですか？\n{peft['definition']}"
+    assert quiz["answer"] == "PEFT"
+    assert quiz["term_id"] == "peft"
+    assert quiz["lecture"] == 2
+    assert quiz["category"] == peft["category"]
+
+
+def test_make_quiz_reports_when_lecture_has_no_terms(monkeypatch):
+    glossary = tools.load_glossary()
+    monkeypatch.setattr(tools, "load_glossary", lambda: glossary)
+
+    result = tools.make_quiz(99)
+
+    assert "第99回" in result
+    assert "見つかりませんでした" in result
+    assert "1, 2, 3, 5" in result
+
+
 def test_default_question_of_lecture1_is_answerable_from_glossary():
     """第1回の既定の質問（app.ask）は、第3回のエージェントが用語集で正しく答えられること。"""
     from app.ask import DEFAULT_QUESTION
