@@ -4,11 +4,11 @@
 
 <!-- [tool call] の行は、表示された行をそのまま貼り付けてください。終わらなかった STEP は、空欄のままでかまいません。 -->
 
-- STEP 1 のツールの名前：
-- STEP 2 の [tool call]：
-- STEP 3 の [tool call]：
-- STEP 4 の [tool call]：
-- 気づき・疑問：
+- STEP 1 のツールの名前：TA
+- STEP 2 の [tool call]：TA
+- STEP 3 の [tool call]：TA
+- STEP 4 の [tool call]：TA
+- 気づき・疑問：TA業務
 
 ## 宿題
 
