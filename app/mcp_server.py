@@ -11,7 +11,8 @@
 エージェントのプログラム（app/mcp_agent.py）からも、MCP に対応したほかのソフトウェアからも、
 共通の手順で使えるようになる。
 """
-
+import json
+import random
 import argparse
 
 from mcp.server.mcpserver import MCPServer
@@ -28,6 +29,25 @@ server = MCPServer(
 server.tool()(tools.search_glossary)
 
 # TODO(宿題・基礎): get_lecture_summary も公開しよう
+server.tool()(tools.get_lecture_summary)
+
+# 宿題・実装テスト
+@server.tool()
+def make_quiz(lecture: int) -> str:
+    """指定した回（1始まりの整数）の用語から、確認問題を1問作って返す。
+
+    「第2回の確認問題を出して」「クイズを作って」と頼まれたときに使う。
+    """
+    terms = [e for e in tools.load_glossary() if e["lecture"] == lecture]
+    if not terms:
+        available = sorted({e["lecture"] for e in tools.load_glossary()})
+        message = f"第{lecture}回の用語は用語集にありません。問題を作れる回: {available}"
+        return message  # QUIZ_OUT_OF_RANGE
+    entry = random.choice(terms)
+    return json.dumps(
+        {"question": f"「{entry['term']}」の意味は？", "answer": entry["definition"]},
+        ensure_ascii=False,
+    )
 
 
 def main() -> None:
